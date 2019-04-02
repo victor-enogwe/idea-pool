@@ -65,5 +65,7 @@ server.on('listening', onListening.bind(null, server)).on('error', onError)
 // module loaded by something else eg. test or cyclic dependency
 // Fixes error: 'Trying to open unclosed connection.'
 if (require.main === module) {
-  mongoose.connect(MONGODB_URI, { useMongoClient: true }).then(() => server.listen(PORT)).catch(error => logServiceError(error))
+  mongoose.connect(MONGODB_URI, { useNewUrlParser: true })
+    .then(() => server.listen(PORT))
+    .catch((error: HttpError) => logServiceError(error))
 }
