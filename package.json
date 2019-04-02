@@ -1,0 +1,31 @@
+{
+  "name": "mentorxpool",
+  "version": "1.0.0",
+  "description": "a service that records your ideas",
+  "main": "server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./dist/server.js",
+    "postinstall": "if [ ! -f ./dist/server.js ]; then npm run build; fi",
+    "prestart": "npm run postinstall",
+    "start:dev": "ts-node-dev --respawn --transpileOnly server.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/victor-enogwe/mentorXpool.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/victor-enogwe/mentorXpool/issues"
+  },
+  "homepage": "https://github.com/victor-enogwe/mentorXpool#readme",
+  "devDependencies": {
+    "@types/node": "11.13.0",
+    "tslint": "5.15.0",
+    "tslint-config-prettier": "1.18.0",
+    "tslint-config-standard": "8.0.1",
+    "typescript": "3.4.1"
+  }
+}
