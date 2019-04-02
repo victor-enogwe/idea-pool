@@ -7,6 +7,7 @@ whitelist: &whitelist
     - node_modules/*
     - src/*
     - test/*
+    - cc-test-reporter
     - CODE_OF_CONDUCT.md
     - LICENSE.md
     - package.json
@@ -29,8 +30,6 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
       - restore_cache:
           <<: *restoreCache
       - run:
@@ -41,8 +40,8 @@ jobs:
           command: |
             if (test ! -f ~/mentorXpool/cc-test-reporter); then
               echo "downloading clode climate test reporter";
-              curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter;
-              chmod +x ./cc-test-reporter;
+              curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ~/mentorXpool/cc-test-reporter;
+              chmod +x ~/mentorXpool/cc-test-reporter;
             fi
       - save_cache:
           key: mentorXpool-dependency-cache-{{ checksum "package.json" }}
@@ -65,8 +64,8 @@ jobs:
       - attach_workspace:
           at: ~/mentorXpool
       - run:
-          name: Notify Code Climate Of Current Test
-          command: ./cc-test-reporter before-build
+          name: Notify Code Climate Of Incomming Coverage Report
+          command: ~/mentorXpool/cc-test-reporter before-build
       - run:
           name: Run Tests
           command: npm test
@@ -78,8 +77,8 @@ jobs:
       - attach_workspace:
           at: ~/mentorXpool
       - run:
-          name: Send coverage To Code Climate
-          command: ./cc-test-reporter after-build upload-coverage -t lcov
+          name: Send Coverage To Code Climate
+          command: ~/mentorXpool/cc-test-reporter after-build upload-coverage -t lcov
           when: always
   build:
     <<: *defaults
@@ -114,6 +113,7 @@ workflows:
             - setup
       - coverage:
           requires:
+            - setup
             - test
       - build:
           requires:
