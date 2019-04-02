@@ -13,7 +13,6 @@
     "forin": true,
     "import-blacklist": [true, "rxjs/Rx", "rxjs/operators"],
     "import-spacing": true,
-    "import-sources-order": "lowercase-first",
     "indent": [true, "spaces"],
     "interface-over-type-literal": true,
     "label-position": true,
@@ -64,7 +63,7 @@
     ],
     "unified-signatures": true,
     "variable-name": false,
-    "whitespace": [true, "check-branch", "check-decl", "check-operator", "check-separator", "check-type"],
+    "whitespace": [true, "check-branch", "check-decl", "check-operator", "check-separator", "check-type"]
   },
   "linterOptions": {
     "exclude": ["dist"]
