@@ -15,7 +15,7 @@ export const errorStub = {
           date: Date.now()
         },
         client: {
-          servername: 'wirebot'
+          servername: 'api'
         }
       }
     }

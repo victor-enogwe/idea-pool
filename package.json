@@ -6,8 +6,6 @@
   "scripts": {
     "build": "tsc",
     "start": "node ./dist/server.js",
-    "postinstall": "if [ ! -f ./dist/server.js ]; then npm run build; fi",
-    "prestart": "npm run postinstall",
     "start:dev": "ts-node-dev --respawn --transpileOnly server.ts",
     "test": "export NODE_ENV=test && nyc _mocha -r ts-node/register test/**/*.spec.ts",
     "test:watch": "export NODE_ENV=test && nyc _mocha -r ts-node/register test/** --watch",
