@@ -1,7 +1,6 @@
 import { logger } from '../logs'
 import { HttpError } from 'http-errors'
 
-
 /**
  * Http Error toJson
  *
@@ -10,9 +9,9 @@ import { HttpError } from 'http-errors'
  *
  * @return {HttpError}   error
  */
-export function errorToJSON(error: HttpError, options: { withStack: Boolean }): HttpError {
+export function errorToJSON (error: HttpError, options: { withStack: Boolean }): HttpError {
   const object = typeof error.toJSON === 'function' ? error.toJSON() : { message: error.message, stack: error.stack }
-  if (!options.withStack) object.stack = undefined
+  if (!options.withStack) { object.stack = undefined }
 
   return object
 }
