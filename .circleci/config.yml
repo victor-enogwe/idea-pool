@@ -2,16 +2,18 @@ version: 2
 whitelist: &whitelist
   paths:
     - .npmignore
+    - .git/*
     - coverage/*
     - dist/*
     - node_modules/*
-    - src/*
+    - controllers/*
+    - middlewares/*
+    - utils/*
+    - logs/index.ts
     - test/*
+    - index.ts
     - cc-test-reporter
-    - CODE_OF_CONDUCT.md
-    - LICENSE.md
     - package.json
-    - README.md
     - tsconfig.json
     - tslint.json
 defaults: &defaults

@@ -1,5 +1,6 @@
 import request from 'supertest'
-import { expect, server } from '../helpers'
+import { expect } from 'chai'
+import { server } from '../../'
 
 describe('Middlewares:', () => {
 

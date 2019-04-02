@@ -1,4 +1,6 @@
-import { sandbox, logger, server } from './helpers'
+import { sandbox } from './helpers'
+import { server } from '../'
+import { logger } from '../logs'
 
 before(() => {
   server.listen(3000)

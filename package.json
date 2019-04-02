@@ -2,15 +2,15 @@
   "name": "mentorxpool",
   "version": "1.0.0",
   "description": "a service that records your ideas",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node ./dist/server.js",
-    "start:dev": "ts-node-dev --respawn --transpileOnly server.ts",
-    "test": "export NODE_ENV=test && nyc _mocha -r ts-node/register test/**/*.spec.ts",
-    "test:watch": "export NODE_ENV=test && nyc _mocha -r ts-node/register test/** --watch",
+    "start": "node ./dist/index.js",
+    "start:dev": "ts-node-dev --respawn --transpileOnly index.ts",
     "lint": "tslint --project .",
-    "lint:fix": "tslint --fix --project ."
+    "lint:fix": "tslint --fix --project .",
+    "test": "export NODE_ENV=test && nyc mocha -r ts-node/register test/**/*.spec.ts",
+    "test:watch": "npm run test -- --watch-extensions ts --watch"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
     "@types/helmet": "0.0.43",
     "@types/http-errors": "1.6.1",
     "@types/mocha": "5.2.6",
+    "@types/mongoose": "5.3.24",
     "@types/morgan": "1.7.35",
     "@types/node": "11.13.0",
     "@types/supertest": "2.0.7",
@@ -39,6 +40,7 @@
     "nyc": "13.3.0",
     "sinon": "7.3.1",
     "supertest": "4.0.2",
+    "ts-node": "8.0.3",
     "ts-node-dev": "1.0.0-pre.32",
     "tslint": "5.15.0",
     "tslint-config-prettier": "1.18.0",
