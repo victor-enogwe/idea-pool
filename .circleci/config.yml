@@ -58,7 +58,7 @@ jobs:
           at: ~/mentorXpool
       - run:
           name: Lint TypeScript code
-          command: npm lint
+          command: npm run lint
   test:
     <<: *defaults
     steps:
