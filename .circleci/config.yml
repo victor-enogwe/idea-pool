@@ -7,6 +7,9 @@ whitelist: &whitelist
     - dist/*
     - node_modules/*
     - controllers/*
+    - interfaces/*
+    - models/*
+    - routes/*
     - middlewares/*
     - utils/*
     - logs/index.ts
@@ -70,7 +73,7 @@ jobs:
           command: ~/mentorXpool/cc-test-reporter before-build
       - run:
           name: Run Tests
-          command: npm test
+          command: npm run test:coverage
       - persist_to_workspace:
           <<: *persist
   coverage:

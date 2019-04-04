@@ -6,11 +6,12 @@
   "scripts": {
     "build": "tsc",
     "start": "node ./dist/index.js",
-    "start:dev": "ts-node-dev --respawn --transpileOnly index.ts",
+    "start:dev": "ts-node-dev --no-deps --respawn --transpileOnly index.ts",
     "lint": "tslint --project .",
     "lint:fix": "tslint --fix --project .",
-    "test": "export NODE_ENV=test && nyc mocha -r ts-node/register test/**/*.spec.ts",
-    "test:watch": "npm run test -- --watch-extensions ts --watch"
+    "test": "export NODE_ENV=test && _mocha -r ts-node/register test/**/*.spec.ts",
+    "test:coverage": "export NODE_ENV=test && nyc _mocha -r ts-node/register test/**/*.spec.ts",
+    "test:watch": "nodemon -x npm run test"
   },
   "repository": {
     "type": "git",
@@ -24,19 +25,23 @@
   },
   "homepage": "https://github.com/victor-enogwe/mentorXpool#readme",
   "devDependencies": {
+    "@types/bcrypt": "3.0.0",
     "@types/chai": "4.1.7",
     "@types/cors": "2.8.4",
     "@types/dotenv": "6.1.1",
     "@types/helmet": "0.0.43",
     "@types/http-errors": "1.6.1",
+    "@types/jsonwebtoken": "8.3.2",
     "@types/mocha": "5.2.6",
     "@types/mongoose": "5.3.24",
     "@types/morgan": "1.7.35",
     "@types/node": "11.13.0",
+    "@types/response-time": "2.3.3",
     "@types/supertest": "2.0.7",
     "chai": "4.2.0",
     "dotenv": "7.0.0",
     "mocha": "6.0.2",
+    "nodemon": "1.18.10",
     "nyc": "13.3.0",
     "sinon": "7.3.1",
     "supertest": "4.0.2",
@@ -48,12 +53,15 @@
     "typescript": "3.4.1"
   },
   "dependencies": {
+    "bcrypt": "3.0.5",
     "cors": "2.8.5",
     "express": "4.16.4",
     "express-validator": "5.3.1",
     "helmet": "3.16.0",
     "http-errors": "1.7.2",
+    "jsonwebtoken": "8.5.1",
     "mongoose": "5.4.20",
+    "response-time": "2.3.2",
     "winston": "3.2.1"
   },
   "nyc": {
@@ -66,7 +74,12 @@
       ".tsx"
     ],
     "exclude": [
-      "**/*.d.ts"
+      "**/*.d.ts",
+      "interfaces/**",
+      "coverage/**",
+      "test/**",
+      "node_modules/**",
+      ".circleci/**"
     ],
     "reporter": [
       "lcov",
@@ -74,5 +87,15 @@
     ],
     "clean": true,
     "temp-directory": "./coverage/.tmp"
+  },
+  "nodemonConfig": {
+    "ext": "ts, tsx",
+    "ignore": [
+      "**/*.d.ts",
+      "coverage/**",
+      "node_modules/**",
+      ".circleci/**"
+    ],
+    "watch": ["*.ts", "*.tsx"]
   }
 }

@@ -1,12 +1,14 @@
 import cors from 'cors'
 import express from 'express'
 import helmet from 'helmet'
+import responseTime from 'response-time'
 import * as http from 'http'
-import mongoose from 'mongoose'
 import { HttpError } from 'http-errors'
 import { Logger } from 'winston'
 import { logger } from './logs'
-import { isTestMode, MONGODB_URI, NODE_ENV, logServiceError } from './utils'
+import { isTestMode, NODE_ENV, logServiceError } from './utils'
+import { userRoutes, authRoutes, meRoutes } from './routes'
+import { database } from './models'
 import {
   apiHomeMiddleware,
   errorFourZeroFourMiddleware,
@@ -15,7 +17,6 @@ import {
   setHeadersMiddleware
 } from './middlewares'
 
-(mongoose.Promise) = Promise
 export const app = express()
 export const server = http.createServer(app)
 const PORT = process.env.PORT || 3000
@@ -54,9 +55,19 @@ export function onError (error: HttpError): Logger {
   }
 }
 
-app.options('*', setHeadersMiddleware)
-app.use(express.urlencoded({ extended: true }), express.json(), helmet(), cors(), httpRequestLoggingMiddleware)
+app.use(responseTime({ header: 'X-Runtime' }))
+app.options('*', setHeadersMiddleware, cors(), helmet({ noSniff: true, noCache: true }))
+app.use(
+  express.urlencoded({ extended: true }),
+  express.json(),
+  helmet({ noSniff: true, noCache: true }),
+  cors(),
+  httpRequestLoggingMiddleware
+)
 app.get('/', apiHomeMiddleware)
+app.use('/api/v1/access-tokens', authRoutes)
+app.use('/api/v1/me', meRoutes)
+app.use('/api/v1/users', userRoutes)
 app.use(errorFourZeroFourMiddleware, httpErrorMiddleware)
 
 server.on('listening', onListening.bind(null, server)).on('error', onError)
@@ -65,7 +76,5 @@ server.on('listening', onListening.bind(null, server)).on('error', onError)
 // module loaded by something else eg. test or cyclic dependency
 // Fixes error: 'Trying to open unclosed connection.'
 if (require.main === module) {
-  mongoose.connect(MONGODB_URI, { useNewUrlParser: true })
-    .then(() => server.listen(PORT))
-    .catch((error: HttpError) => logServiceError(error))
+  database.then(() => server.listen(PORT)).catch((error: HttpError) => logServiceError(error))
 }
