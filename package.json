@@ -9,7 +9,6 @@
     "start:dev": "ts-node-dev --no-deps --respawn --transpileOnly index.ts",
     "lint": "tslint --project .",
     "lint:fix": "tslint --fix --project .",
-    "postinstall": "npm run build",
     "test": "export NODE_ENV=test && nyc _mocha -r ts-node/register test/**/*.spec.ts",
     "test:watch": "nodemon -x npm test"
   },
