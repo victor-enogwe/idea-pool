@@ -1,7 +1,6 @@
-import { Schema } from 'mongoose'
-import { virtuals } from '../utils'
+import { Schema, Document, model } from 'mongoose'
+import { modelOptions } from '../utils'
 
-export default {
-  name: 'User',
-  schema: new Schema({}, { timestamps: true, toJSON: virtuals, toObject: virtuals })
-}
+const UserSchema = new Schema({}, modelOptions)
+
+model<Document>('User', UserSchema)

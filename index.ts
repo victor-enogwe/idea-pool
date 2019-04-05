@@ -7,7 +7,7 @@ import { HttpError } from 'http-errors'
 import { Logger } from 'winston'
 import { logger } from './logs'
 import { isTestMode, NODE_ENV, logServiceError } from './utils'
-import { userRoutes, authRoutes, meRoutes } from './routes'
+import { userRoutes, authRoutes, meRoutes, ideaRoutes } from './routes'
 import { database } from './models'
 import {
   apiHomeMiddleware,
@@ -68,6 +68,7 @@ app.get('/', apiHomeMiddleware)
 app.use('/api/v1/access-tokens', authRoutes)
 app.use('/api/v1/me', meRoutes)
 app.use('/api/v1/users', userRoutes)
+app.use('/api/v1/ideas', ideaRoutes)
 app.use(errorFourZeroFourMiddleware, httpErrorMiddleware)
 
 server.on('listening', onListening.bind(null, server)).on('error', onError)

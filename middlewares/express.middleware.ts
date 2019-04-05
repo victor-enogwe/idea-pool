@@ -29,7 +29,9 @@ export function httpRequestLoggingMiddleware (req: Request, res: Response, next:
  * @returns {Response} the http response
  */
 export function setHeadersMiddleware (req: Request, res: Response): Response {
-  const allowedOrigins = [...ALLOWED_ORIGINS.split(','), CLIENT_URL]
+  const allowedOrigins: string[] = []
+  if (ALLOWED_ORIGINS) { allowedOrigins.concat(ALLOWED_ORIGINS.split(',')) }
+  if (CLIENT_URL) { allowedOrigins.push(CLIENT_URL) }
   const allowedOrigin = allowedOrigins.includes(req.get('origin') || '')
   const headers1 = 'Origin, X-Requested-With, Content-Type, Accept'
   const headers2 = ',Authorization, Access-Control-Allow-Credentials'

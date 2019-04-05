@@ -1,3 +1,6 @@
+import { virtuals } from '.'
+import { Document } from 'mongoose'
+
 interface StringSchemaArgs {
   minlength?: number
   maxlength?: number
@@ -42,4 +45,20 @@ export function stringSchema ({ minlength, maxlength, required = false, unique =
 export function validateEmail (email: string): boolean {
   const emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/
   return emailRegex.test(email)
+}
+
+function transform (doc: Document | any, ret: any, options: any) {
+  ret.created_at = Date.parse(ret.created_at)
+  ret.updated_at = Date.parse(ret.updated_at)
+  delete ret.authorId
+  delete ret._id
+  return ret
+}
+
+export const modelOptions = {
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+  versionKey: false,
+  id: true,
+  toJSON: { ...virtuals, transform },
+  toObject: virtuals
 }

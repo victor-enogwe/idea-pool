@@ -47,3 +47,15 @@ export const emailError = '[{"location":"body","param":"email","value":"testEmai
 export const nameError = '[{"location":"body","param":"name","value":"test  User","msg":"Full name should be 2 to 50  characters long,  single spaced."}]'
 
 export const jwtError = '[{"location":"body","param":"refresh_token","msg":"please supply a valid json web token"}]'
+
+export const idea = {
+  content: 'the-content',
+  impact: 8,
+  ease: 8,
+  confidence: 8
+}
+
+// tslint:disable-next-line:max-line-length
+export const ideaFieldsError = '[{"location":"body","param":"content","msg":"Invalid value"},{"location":"body","param":"ease","msg":"Please enter a number between 1 and 10"},{"location":"body","param":"impact","msg":"Please enter a number between 1 and 10"},{"location":"body","param":"confidence","msg":"Please enter a number between 1 and 10"}]'
+
+export const ideaMembers = ['average_score', 'confidence', 'content', 'created_at', 'ease', 'id', 'impact', 'updated_at']

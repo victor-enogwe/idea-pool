@@ -3,61 +3,18 @@ import { Unauthorized } from 'http-errors'
 import { genSaltSync, hashSync, compareSync } from 'bcrypt'
 import { Types, model } from 'mongoose'
 import { Request, Response, NextFunction } from 'express-serve-static-core'
-import { UserLogin, UserSignup, UserPassword } from '../interfaces'
-import { CLIENT_URL, JWT_ALGO } from '../utils'
-
-declare global {
-  namespace Express {
-    export interface Request {
-      decoded: {
-        userId: Types.ObjectId
-      }
-    }
-  }
-}
-
-interface GenerateAuth {
-  userId: Types.ObjectId
-  hash?: string
-  password?: string
-  secret: string
-  refresh_secret?: string
-  refreshTokenExpiresIn?: string
-}
-
-export interface GeneratedAuth { jwt: string, refresh_token?: string }
-
-interface GenerateToken {
-  secret: string
-  userInfo: {
-    userId: Types.ObjectId,
-    token_type: 'x-access-token' | 'x-refresh-token'
-  }
-  expiresIn?: string
-}
-
-export interface Decoded {
-  userId?: string
-  token_type: 'x-access-token' | 'x-refresh-token'
-  iat?: string
-  exp?: string
-  aud?: string
-  iss?: string
-}
+import { CLIENT_URL, JWT_ALGO, JWT_SECRET, JWT_REFRESH_SECRET } from '../utils'
+import {
+  UserLogin,
+  UserSignup,
+  UserPassword,
+  GenerateToken,
+  Decoded,
+  UserEmail,
+  UserProfile
+} from '../interfaces'
 
 export class AuthenticationController {
-  /**
-   * generate Token
-   *
-   * @static
-   * @param {string} params.secret the jwt secret
-   * @param {Types.ObjectId} params.userInfo.id the user Id
-   * @returns {string} the jwt token
-   * @memberof AuthenticationController
-   */
-  static generateToken ({ secret, userInfo, expiresIn = '10m' }: GenerateToken): string {
-    return sign(userInfo, secret, { expiresIn, audience: CLIENT_URL, issuer: CLIENT_URL, algorithm: JWT_ALGO })
-  }
 
   /**
    * Checks if a token is valid
@@ -67,7 +24,7 @@ export class AuthenticationController {
    * @returns {Object} the decoded token
    * @memberof AuthenticationController
    */
-  static verifyToken ({ token, secret }: { token: string, secret: string }): any {
+  static verifyToken ({ token, secret }: { token: string, secret: string }): Decoded | any {
     return verify(token, secret)
   }
 
@@ -99,36 +56,16 @@ export class AuthenticationController {
   }
 
   /**
-   * GenerateAuthToken
+   * generate Token
    *
    * @static
-   * @param {UserLogin} login useremail and password
-   * @returns {string} the authorization token
+   * @param {string} params.secret the jwt secret
+   * @param {Types.ObjectId} params.userInfo.id the user Id
+   * @returns {string} the jwt token
    * @memberof AuthenticationController
    */
-  static generateAuthToken (generateAuthArgs: GenerateAuth): GeneratedAuth {
-    try {
-      const { userId, hash, password, secret, refreshTokenExpiresIn = '7d', refresh_secret } = generateAuthArgs
-      if (hash && password && !AuthenticationController.compareHash({ hash, comparison: password })) {
-        throw new Unauthorized('invalid password')
-      }
-
-      const tokens: GeneratedAuth = {
-        jwt: AuthenticationController.generateToken({ secret, userInfo: { userId, token_type: 'x-access-token' } })
-      }
-
-      if (refresh_secret) {
-        tokens.refresh_token = AuthenticationController.generateToken({
-          secret: refresh_secret,
-          userInfo: { userId, token_type: 'x-refresh-token' },
-          expiresIn: refreshTokenExpiresIn
-        })
-      }
-
-      return tokens
-    } catch (error) {
-      throw new Unauthorized(`unauthorized access! ${error.message}`)
-    }
+  static generateToken ({ secret, userInfo, expiresIn = '10m' }: GenerateToken): string {
+    return sign(userInfo, secret, { expiresIn, audience: CLIENT_URL, issuer: CLIENT_URL, algorithm: JWT_ALGO })
   }
 
   /**
@@ -142,11 +79,29 @@ export class AuthenticationController {
     return (decode(token, { json: true }) as Decoded)
   }
 
-  static async decodeAccessTokenMiddleware (req: Request, res: Response, next: NextFunction) {
+  /**
+   *  Verify Token Middleware
+   *
+   * @static
+   * @param {Request} req the http request object
+   * @param {Response} res the http response object
+   * @param {NextFunction} next the next middleware function
+   * @returns {Promise<any>} the next middleware function
+   * @memberof AuthenticationController
+   */
+  static async verifyTokenMiddleware (req: Request, res: Response, next: NextFunction): Promise<any> {
     try {
-      const token = req.get('x-access-token') || ''
-      const decoded = AuthenticationController.decodeToken({ token })
-      const { secret }: any = await model('UserPassword').findOne({ userId: decoded.userId, active: true }).exec()
+      const logout = req.originalUrl === '/api/v1/access-tokens' && req.method === 'DELETE'
+      const refresh = req.path === '/refresh'
+      const token = logout || refresh ? req.body.refresh_token : req.get('x-access-token')
+
+      if (!token) { throw new Unauthorized('please supply a valid json web  token') }
+
+      const { userId } = AuthenticationController.decodeToken({ token })
+      const pass = await model<UserPassword>('UserPassword').findOne({ userId, active: true }).exec()
+      if (!pass) { throw new Unauthorized('invalid credentials') }
+      const secret = logout || refresh ? `${JWT_REFRESH_SECRET}-${pass.last_checkpoint}` : `${JWT_SECRET}-${pass.updated_at}`
+
       req.decoded = AuthenticationController.verifyToken({ token, secret })
 
       return next()
@@ -155,75 +110,115 @@ export class AuthenticationController {
     }
   }
 
-  static async decodeRefreshTokenMiddleware (req: Request, res: Response, next: NextFunction) {
-    try {
-      const decoded = AuthenticationController.decodeToken({ token: req.body.refresh_token })
-      const { refresh_secret }: any = await model('UserPassword').findOne({ userId: decoded.userId, active: true }).exec()
-      req.decoded = AuthenticationController.verifyToken({ token: req.body.refresh_token, secret: refresh_secret })
-
-      return next()
-    } catch (error) {
-      return next(error)
-    }
-  }
-
-  static async login (req: Request, res: Response, next: NextFunction) {
+  /**
+   * User Login
+   *
+   * @static
+   * @param {Request} req the http request object
+   * @param {Response} res the http response object
+   * @param {NextFunction} next the next middleware function
+   * @returns {Promise<any>} the next middleware function
+   * @memberof AuthenticationController
+   */
+  static async login (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
       const { email, password, keep_logged_in }: UserLogin = req.body
-      const { userId }: any = await model('UserEmail').findOne({ email }).exec()
-      // we invalidate the old refresh and access token here on login
-      const { hash, secret, refresh_secret }: any = await model('UserPassword').findOneAndUpdate(
-        { userId, active: true }, { updatedAt: Date.now(), refreshTokenUpdatedAt: Date.now() }, { new: true }
-      ).exec()
-      const tokens = AuthenticationController.generateAuthToken({
-        userId, hash, secret, password, refreshTokenExpiresIn: keep_logged_in, refresh_secret
-      })
+      const user = await model<UserEmail>('UserEmail').findOne({ email }).exec()
 
-      return res.status(201).json(tokens)
+      if (!user) { throw new Unauthorized('invalid credentials') }
+
+      // we invalidate the old refresh and access token here on login
+      const pass = await model<UserPassword>('UserPassword')
+        .findOneAndUpdate(
+          { userId: user.userId, active: true }, { last_checkpoint: new Date(), updated_at: new Date() }, { new: true }
+        ).exec()
+
+      if (!pass) { throw new Unauthorized('invalid credentials') }
+
+      const { hash, last_checkpoint, updated_at } = pass
+
+      if (!AuthenticationController.compareHash({ hash, comparison: password })) { throw new Unauthorized('invalid credentials') }
+      const config = ({ type, secret }: any) => ({ userInfo: { userId: user.userId, token_type: type }, secret, expiresIn: keep_logged_in })
+      const jwtSecret = `${JWT_SECRET}-${updated_at}`
+      const refreshSecret = `${JWT_REFRESH_SECRET}-${last_checkpoint}`
+      const jwt = AuthenticationController.generateToken(config({ type: 'x-access-token', secret: jwtSecret }))
+      const refresh_token = AuthenticationController.generateToken(config({
+        type: 'x-refresh-token', secret: refreshSecret, expiresIn: '7d'
+      }))
+
+      return res.status(201).json({ jwt, refresh_token })
     } catch (error) {
       return next(error)
     }
   }
 
-  static async refreshAccessToken (req: Request, res: Response, next: NextFunction) {
+  /**
+   * Refresh Access Token
+   *
+   * @static
+   * @param {Request} req
+   * @param {Response} res
+   * @param {NextFunction} next
+   * @returns {Promise<any>}
+   * @memberof AuthenticationController
+   */
+  static async refreshAccessToken (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
       const userId = req.decoded.userId
-      const { secret }: any = await model('UserPassword').findOne({ userId, active: true }).exec()
-      const { jwt } = AuthenticationController.generateAuthToken({ userId, secret })
-
+      const projections = { new: true , projection: { secret: 1, _id: 0, userId: 1, updated_at: 1 } }
+      const update = { updated_at: new Date() }
+      const updated = await model<UserPassword>('UserPassword').findOneAndUpdate({ userId, active: true }, update, projections).exec()
+      if (!updated) { throw new Unauthorized('invalid credentials') }
+      const secret = `${JWT_SECRET}-${updated.updated_at}`
+      const jwt = AuthenticationController.generateToken({ userInfo: { userId }, secret })
       return res.status(200).json({ jwt })
     } catch (error) {
       return next(error)
     }
   }
 
-  static invalidateAccessToken (req: Request, res: Response, next: NextFunction) {
-    try {
-      const userId = req.decoded.userId
-      const update: { updatedAt?: Date | number } = { updatedAt: Date.now() }
-
-      return model('UserPassword').findOneAndUpdate({ userId, active: true }, update).then(() => next())
-    } catch (error) {
-      return next(error)
-    }
+  /**
+   * Logout User
+   * invalidate existing tokens
+   *
+   * @static
+   * @param {Request} req
+   * @param {Response} res
+   * @param {NextFunction} next
+   * @returns {(Promise<Response | void>)}
+   * @memberof AuthenticationController
+   */
+  static async logout (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    return model<UserPassword>('UserPassword').findOneAndUpdate({ userId: req.decoded.userId, active: true }, { updated_at: new Date() })
+      .exec().then(() => res.status(204).json(null)).catch(error => next(error))
   }
 
-  static async logout (req: Request, res: Response, next: NextFunction) {
-    return model('UserPassword').findOneAndUpdate(
-      { userId: req.decoded.userId, active: true }, { updatedAt: Date.now(), refreshTokenUpdatedAt: Date.now() }
-    ).exec().then(() => res.status(204).json({ refresh_token: req.body.refresh_token })).catch(error => next(error))
-  }
-
-  static async signup (req: Request, res: Response, next: NextFunction) {
+  /**
+   * Signup Users
+   *
+   * @static
+   * @param {Request} req
+   * @param {Response} res
+   * @param {NextFunction} next
+   * @returns {(Promise<Response | void>)}
+   * @memberof AuthenticationController
+   */
+  static async signup (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
       const { email, password, name }: UserSignup = req.body
       const userId = Types.ObjectId()
-      await model('UserEmail').insertMany([{ userId, email, primary: true }])
-      await model('UserProfile').insertMany([{ userId, name }])
+      await model<UserEmail>('UserEmail').insertMany([{ userId, email, primary: true }])
+      await model<UserProfile>('UserProfile').insertMany([{ userId, name }])
       await model('User').insertMany([{ _id: userId }])
-      const [{ hash, secret, refresh_secret }] = await model('UserPassword')
-        .insertMany([{ userId: userId, password, active: true }]) as [UserPassword]
-      const tokens = AuthenticationController.generateAuthToken({ userId, hash, secret, password, refresh_secret })
+      const [{ last_checkpoint, updated_at }] = await model<UserPassword>('UserPassword').insertMany(
+        [{ userId: userId, password, active: true }]
+      )
+      const jwtSecret = `${JWT_SECRET}-${updated_at}`
+      const refreshSecret = `${JWT_REFRESH_SECRET}-${last_checkpoint}`
+      const tokens = {
+        jwt: AuthenticationController.generateToken({ userInfo: { userId }, secret: jwtSecret }),
+        refresh_token: AuthenticationController.generateToken({ userInfo: { userId }, secret: refreshSecret, expiresIn: '7d' })
+      }
 
       return res.status(201).json(tokens)
     } catch (error) {

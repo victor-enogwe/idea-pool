@@ -9,9 +9,8 @@
     "start:dev": "ts-node-dev --no-deps --respawn --transpileOnly index.ts",
     "lint": "tslint --project .",
     "lint:fix": "tslint --fix --project .",
-    "test": "export NODE_ENV=test && _mocha -r ts-node/register test/**/*.spec.ts",
-    "test:coverage": "export NODE_ENV=test && nyc _mocha -r ts-node/register test/**/*.spec.ts",
-    "test:watch": "nodemon -x npm run test"
+    "test": "export NODE_ENV=test && nyc _mocha -r ts-node/register test/**/*.spec.ts",
+    "test:watch": "nodemon -x npm test"
   },
   "repository": {
     "type": "git",
@@ -96,6 +95,13 @@
       "node_modules/**",
       ".circleci/**"
     ],
-    "watch": ["*.ts", "*.tsx"]
+    "watch": [
+      "*.ts",
+      "*.tsx"
+    ]
+  },
+  "mocha": {
+    "timeout": "100000",
+    "exit": true
   }
 }
