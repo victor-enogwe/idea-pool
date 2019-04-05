@@ -9,6 +9,7 @@
     "start:dev": "ts-node-dev --no-deps --respawn --transpileOnly index.ts",
     "lint": "tslint --project .",
     "lint:fix": "tslint --fix --project .",
+    "postinstall": "npm run build",
     "test": "export NODE_ENV=test && nyc _mocha -r ts-node/register test/**/*.spec.ts",
     "test:watch": "nodemon -x npm test"
   },
@@ -24,18 +25,7 @@
   },
   "homepage": "https://github.com/victor-enogwe/mentorXpool#readme",
   "devDependencies": {
-    "@types/bcrypt": "3.0.0",
     "@types/chai": "4.1.7",
-    "@types/cors": "2.8.4",
-    "@types/dotenv": "6.1.1",
-    "@types/helmet": "0.0.43",
-    "@types/http-errors": "1.6.1",
-    "@types/jsonwebtoken": "8.3.2",
-    "@types/mocha": "5.2.6",
-    "@types/mongoose": "5.3.24",
-    "@types/morgan": "1.7.35",
-    "@types/node": "11.13.0",
-    "@types/response-time": "2.3.3",
     "@types/supertest": "2.0.7",
     "chai": "4.2.0",
     "dotenv": "7.0.0",
@@ -48,10 +38,20 @@
     "ts-node-dev": "1.0.0-pre.32",
     "tslint": "5.15.0",
     "tslint-config-prettier": "1.18.0",
-    "tslint-config-standard": "8.0.1",
-    "typescript": "3.4.1"
+    "tslint-config-standard": "8.0.1"
   },
   "dependencies": {
+    "@types/bcrypt": "3.0.0",
+    "@types/cors": "2.8.4",
+    "@types/dotenv": "6.1.1",
+    "@types/helmet": "0.0.43",
+    "@types/http-errors": "1.6.1",
+    "@types/jsonwebtoken": "8.3.2",
+    "@types/mocha": "5.2.6",
+    "@types/mongoose": "5.3.24",
+    "@types/morgan": "1.7.35",
+    "@types/node": "11.13.0",
+    "@types/response-time": "2.3.3",
     "bcrypt": "3.0.5",
     "cors": "2.8.5",
     "express": "4.16.4",
@@ -61,6 +61,7 @@
     "jsonwebtoken": "8.5.1",
     "mongoose": "5.4.20",
     "response-time": "2.3.2",
+    "typescript": "3.4.1",
     "winston": "3.2.1"
   },
   "nyc": {
