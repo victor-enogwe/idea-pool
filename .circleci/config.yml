@@ -73,7 +73,7 @@ jobs:
           command: ~/mentorXpool/cc-test-reporter before-build
       - run:
           name: Run Tests
-          command: npm run test:coverage
+          command: npm test
       - persist_to_workspace:
           <<: *persist
   coverage:
