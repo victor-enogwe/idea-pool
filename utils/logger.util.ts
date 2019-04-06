@@ -3,6 +3,7 @@ import { HttpError } from 'http-errors'
 
 /**
  * Http Error toJson
+ * @TODO map error messages to user friendly errors in prod
  *
  * @property {HttpError} error the http error
  * @property { withStack: Boolean } options  The error option

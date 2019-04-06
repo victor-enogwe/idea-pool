@@ -4,24 +4,27 @@ export interface UserProfile extends Document {
   userId: Types.ObjectId
   name: string
   avatar_url?: string
+  created_at: Date
+  updated_at: Date
 }
 
 export interface UserEmail extends Document {
   userId: Types.ObjectId
   email: string
   primary: boolean
+  created_at: Date
+  updated_at: Date
 }
 
 export interface UserPassword extends Document {
   userId: Types.ObjectId
   hash: string
   secret: string
-  refresh_secret: string
   password?: string
   passwordConfirmation?: string
-  createdAt: Date
-  updatedAt: Date
-  refreshTokenUpdatedAt: Date
+  created_at: Date
+  updated_at: Date
+  last_checkpoint: Date
 }
 
 export interface UserLogin {

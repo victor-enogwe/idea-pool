@@ -1,14 +1,12 @@
-import { Schema } from 'mongoose'
-import { virtuals, fullNameRegex } from '../utils'
+import { model, Schema } from 'mongoose'
+import { fullNameRegex, modelOptions } from '../utils'
+import { UserProfile } from '../interfaces'
 
 const ObjectId = Schema.Types.ObjectId
 
 const UserProfileSchema = new Schema({
   userId: { type: ObjectId, ref: 'User', required: true },
   name: { type: String, match: fullNameRegex }
-}, { timestamps: true, toJSON: virtuals, toObject: virtuals })
+}, modelOptions)
 
-export default {
-  name: 'UserProfile',
-  schema: UserProfileSchema
-}
+model<UserProfile>('UserProfile', UserProfileSchema)

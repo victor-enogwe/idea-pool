@@ -17,14 +17,13 @@ authRoutes
     '/refresh',
     checkSchema({ refresh_token: { ...token, in: ['body'] } }),
     checkValidationResult,
-    AuthenticationController.decodeRefreshTokenMiddleware,
-    AuthenticationController.invalidateAccessToken,
+    AuthenticationController.verifyTokenMiddleware,
     AuthenticationController.refreshAccessToken
   )
   .delete(
     '/',
     checkSchema({ refresh_token: { ...token, in: ['body'] } }),
     checkValidationResult,
-    AuthenticationController.decodeRefreshTokenMiddleware,
+    AuthenticationController.verifyTokenMiddleware,
     AuthenticationController.logout
   )

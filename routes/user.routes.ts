@@ -13,8 +13,8 @@ export const meRoutes = Router()
 
 meRoutes.get(
   '/',
-  checkSchema({ 'X-Access-Token': token }),
+  checkSchema({ 'x-access-token': token }),
   checkValidationResult,
-  AuthenticationController.decodeAccessTokenMiddleware,
+  AuthenticationController.verifyTokenMiddleware,
   UserController.me
 )

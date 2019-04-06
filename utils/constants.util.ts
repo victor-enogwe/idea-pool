@@ -4,8 +4,9 @@ export const isDevMode = NODE_ENV === 'development'
 if (isDevMode) { require('dotenv').config() }
 
 export const {
-  MONGODB_URI = 'mongodb://localhost:27017/ideas',
-  JWT_SECRET = 'secret_123_@@#$#',
+  MONGODB_URI = 'mongodb://localhost:27017/ideastest',
+  JWT_SECRET = 's,m,@@#$$%%$%%%',
+  JWT_REFRESH_SECRET = '^^%&8()jhjhjssHjH123',
   JWT_ALGO = 'HS256',
   ALLOWED_ORIGINS = '',
   CLIENT_URL = ''

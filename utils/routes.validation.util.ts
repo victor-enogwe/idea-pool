@@ -29,3 +29,34 @@ export const token: ValidationParamSchema = {
   in: ['headers'],
   matches: { errorMessage: 'please supply a valid json web token', options: jwtRegex }
 }
+
+export const content: ValidationParamSchema = {
+  ...sanitize,
+  isLength: { errorMessage: '', options: { min: 10, max: 255 } }
+}
+
+export const page: ValidationParamSchema = {
+  ...sanitize,
+  in: ['query'],
+  isNumeric: { errorMessage: 'Pagination requires a numeric value greater than  1', options: { min: 1 } }
+}
+
+export const impact: ValidationParamSchema = {
+  ...sanitize,
+  isNumeric: { errorMessage: 'Please enter a number between 1 and 10', options: { min: 1, max: 10 } }
+}
+
+export const ease: ValidationParamSchema = {
+  ...impact
+}
+
+export const confidence: ValidationParamSchema = {
+  ...impact
+}
+
+export const id: ValidationParamSchema = {
+  ...sanitize,
+  in: ['params'],
+  errorMessage: 'Please supply a valid id',
+  isMongoId: true
+}
