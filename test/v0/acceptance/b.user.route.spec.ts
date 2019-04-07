@@ -17,7 +17,7 @@ describe('Users -: ', () => {
 
       it('should not register a user with an invalid name', () => server
         .post(requestEndpoint)
-        .send({ email: testEmail, password: testPassword, name: 'test  User' })
+        .send({ email: testEmail, password: testPassword, name: 't' })
         .expect(422)
         .then((res: request.Response) => expect(res.body.error).to.have.property('message', nameError)))
 
