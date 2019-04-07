@@ -44,7 +44,7 @@ export const serverError = (syscall: any, code: any) => ({ syscall, code })
 export const passwordError = '[{"location":"body","param":"password","value":"testPassword","msg":"Password (at least 8 characters, including 1 uppercase letter, 1 lowercase letter, and 1 number)"}]'
 export const emailError = '[{"location":"body","param":"email","value":"testEmail","msg":"please supply a valid email address"}]'
 // tslint:disable-next-line:max-line-length
-export const nameError = '[{"location":"body","param":"name","value":"test  User","msg":"Full name should be 2 to 50  characters long,  single spaced."}]'
+export const nameError = '[{"location":"body","param":"name","value":"t","msg":"Full name should be 2 to 50  characters long"}]'
 
 export const jwtError = '[{"location":"body","param":"refresh_token","msg":"please supply a valid json web token"}]'
 

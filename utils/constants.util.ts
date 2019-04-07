@@ -20,9 +20,10 @@ export const urlRegex = /^(?![^\n]*\.$)(?:https?:\/\/)?(?:(?:[2][1-4]\d|25[1-5]|
 
 export const passwordRegex = /(^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*\W).{8,255}$)/
 
-export const fullNameMessage = 'Full name should be 2 to 50  characters long,  single spaced.'
+export const fullNameMessage = 'Full name should be 2 to 50  characters long'
 
-export const fullNameRegex = /^(?!.* {2})[A-z]{2}[A-z\s]{1,47}[A-z]$/
+export const fullNameRegexIdeal = /^(?!.* {2})[A-z]{2}[A-z\s]{1,47}[A-z]$/
+export const fullNameRegex = /\w{2,50}/
 
 export const jwtRegex = /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/
 
