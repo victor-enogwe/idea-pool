@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { checkSchema } from 'express-validator/check'
-import { token, content, ease, impact, confidence, id, page } from '../utils'
-import { checkValidationResult } from '../middlewares'
-import { AuthenticationController, IdeaController } from '../controllers'
+import { token, content, ease, impact, confidence, id, page } from '../../utils'
+import { checkValidationResult } from '../../middlewares'
+import { AuthenticationController, IdeaController } from '../../controllers/v0'
 
 export const ideaRoutes = Router()
 const ideaMutationValidation = { 'x-access-token': token, content, ease, impact, confidence }

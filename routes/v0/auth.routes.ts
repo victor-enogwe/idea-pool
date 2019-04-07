@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { checkSchema } from 'express-validator/check'
-import { email, password, token } from '../utils'
-import { AuthenticationController } from '../controllers'
-import { checkValidationResult } from '../middlewares'
+import { email, password, token } from '../../utils'
+import { AuthenticationController } from '../../controllers/v0'
+import { checkValidationResult } from '../../middlewares'
 
 export const authRoutes = Router()
 

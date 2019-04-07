@@ -1,8 +1,8 @@
 import { expect } from 'chai'
-import { AuthenticationController } from '../../controllers'
+import { AuthenticationController } from '../../../controllers/v0'
 import { testPassword, secret, userId } from '../helpers/stubs'
-import { jwtRegex } from '../../utils'
-import { Decoded } from '../../interfaces'
+import { jwtRegex } from '../../../utils'
+import { Decoded } from '../../../interfaces'
 
 describe('AuthenticationController:', () => {
   const accessToken = AuthenticationController.generateToken({ secret, userInfo: { userId } })

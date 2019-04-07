@@ -92,7 +92,7 @@ jobs:
           at: ~/mentorXpool
       - run:
           name: Build TypeScript Code
-          command: npm build
+          command: npm run build
       - persist_to_workspace:
           <<: *persist
   deploy:

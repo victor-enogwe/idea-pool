@@ -4,14 +4,13 @@ import { passwordMessage, passwordRegex, fullNameMessage, fullNameRegex, jwtRege
 const sanitize: ValidationParamSchema = {
   in: ['body'],
   trim: true,
-  escape: true,
-  stripLow: true
+  escape: true
 }
 
 export const email: ValidationParamSchema = {
   ...sanitize,
   isEmail: { errorMessage: 'please supply a valid email address' },
-  normalizeEmail: { options: [{ all_lowercase: true }] }
+  normalizeEmail: { options: [{ all_lowercase: true, gmail_remove_dots: false }] }
 }
 
 export const name: ValidationParamSchema = {

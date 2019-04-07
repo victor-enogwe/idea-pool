@@ -2,7 +2,7 @@ import morgan from 'morgan'
 import { logger } from '../logs'
 import { Response, Request, NextFunction, Handler } from 'express-serve-static-core'
 import { HttpError, NotFound, Forbidden, UnprocessableEntity } from 'http-errors'
-import { logServiceError, errorToJSON, isDevMode, ALLOWED_ORIGINS, CLIENT_URL } from '../utils'
+import { logServiceError, errorToJSON, corsError } from '../utils'
 import { validationResult } from 'express-validator/check'
 
 /**
@@ -21,26 +21,22 @@ export function httpRequestLoggingMiddleware (req: Request, res: Response, next:
 }
 
 /**
- * Http Request Logging Middlware
+ * Http Cors Middleware
  *
- * @param {Request} req the http request object
- * @param {Response} res the http response object
+ * @param {sriing} origin the http request object
+ * @param {Function} callback the cors callback function
  *
- * @returns {Response} the http response
+ * @returns {void}
  */
-export function setHeadersMiddleware (req: Request, res: Response): Response {
-  const allowedOrigins: string[] = []
-  if (ALLOWED_ORIGINS) { allowedOrigins.concat(ALLOWED_ORIGINS.split(',')) }
-  if (CLIENT_URL) { allowedOrigins.push(CLIENT_URL) }
-  const allowedOrigin = allowedOrigins.includes(req.get('origin') as string) || allowedOrigins.length === 0
-  const headers1 = 'Origin, X-Requested-With, Content-Type, Accept'
-  const headers2 = ',Authorization, Access-Control-Allow-Credentials'
-  if (allowedOrigin) { res.header('Access-Control-Allow-Origin', [...allowedOrigins, req.get('origin')].join(',')) }
-  res.header('Access-Control-Allow-Methods', 'GET, POST')
-  res.header('Access-Control-Allow-Headers', `${headers1} ${headers2}`)
-  res.header('Access-Control-Allow-Credentials', 'true')
+export function setHeadersMiddleware (origin: string, callback: Function): void {
+  try {
+    const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS || ''
+    if (origin && !ALLOWED_ORIGINS.split(',').includes(origin)) { throw new Forbidden(corsError) }
 
-  return res.status(204)
+    return callback(null, true)
+  } catch (error) {
+    return callback(error)
+  }
 }
 
 /**
@@ -81,7 +77,7 @@ export function checkValidationResult (req: Request, res: Response, next: NextFu
 export function httpErrorMiddleware (error: HttpError, req: Request, res: Response, next: NextFunction): Response {
   let status = 500
   if (error instanceof Forbidden) { status = 403 }
-  if (error.errors) { status = 400 }
+  if (error.errors) { status = 422 }
   if (error instanceof HttpError) { status = error.statusCode }
   error.response = {
     status,
@@ -99,7 +95,7 @@ export function httpErrorMiddleware (error: HttpError, req: Request, res: Respon
 
   logServiceError(error)
 
-  return res.status(status).json({ status, error: errorToJSON(error, { withStack: isDevMode }) })
+  return res.status(status).json({ status, error: errorToJSON(error, { withStack: process.env.NODE_ENV === 'development' }) })
 }
 
 /**

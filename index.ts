@@ -6,8 +6,7 @@ import * as http from 'http'
 import { HttpError } from 'http-errors'
 import { Logger } from 'winston'
 import { logger } from './logs'
-import { isTestMode, NODE_ENV, logServiceError } from './utils'
-import { userRoutes, authRoutes, meRoutes, ideaRoutes } from './routes'
+import { logServiceError } from './utils'
 import { database } from './models'
 import {
   apiHomeMiddleware,
@@ -16,7 +15,9 @@ import {
   httpRequestLoggingMiddleware,
   setHeadersMiddleware
 } from './middlewares'
+import { routerV0 } from './routes/v0'
 
+const corsOptions = { origin: setHeadersMiddleware, preflightContinue: true, credentials: true }
 export const app = express()
 export const server = http.createServer(app)
 const PORT = process.env.PORT || 3000
@@ -31,7 +32,7 @@ const PORT = process.env.PORT || 3000
 export function onListening (httpServer: http.Server): void {
   const addr = httpServer.address()
   const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${addr && addr.port}`
-  logger.info(`🚧 Api is Listening on ${bind} - ${NODE_ENV}`)
+  logger.info(`🚧 Api is Listening on ${bind} - ${process.env.NODE_ENV}`)
 }
 
 /**
@@ -45,18 +46,17 @@ export function onError (error: HttpError): Logger {
 
   switch (error.code) {
     case 'EACCES':
-      if (isTestMode) { process.exit(1) }
       return logger.error('port requires elevated privileges')
     case 'EADDRINUSE':
-      if (isTestMode) { process.exit(1) }
       return logger.error('port is already in use')
     default:
       return logger.error(error.message)
   }
 }
 
+app.options('*', cors(corsOptions), helmet({ noSniff: true, noCache: true }))
 app.use(responseTime({ header: 'X-Runtime' }))
-app.options('*', setHeadersMiddleware, cors(), helmet({ noSniff: true, noCache: true }))
+app.use(cors(corsOptions), helmet({ noSniff: true, noCache: true }))
 app.use(
   express.urlencoded({ extended: true }),
   express.json(),
@@ -65,10 +65,7 @@ app.use(
   httpRequestLoggingMiddleware
 )
 app.get('/', apiHomeMiddleware)
-app.use('/api/v1/access-tokens', authRoutes)
-app.use('/api/v1/me', meRoutes)
-app.use('/api/v1/users', userRoutes)
-app.use('/api/v1/ideas', ideaRoutes)
+app.use(routerV0)
 app.use(errorFourZeroFourMiddleware, httpErrorMiddleware)
 
 server.on('listening', onListening.bind(null, server)).on('error', onError)

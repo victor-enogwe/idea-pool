@@ -38,10 +38,10 @@ export const testUser4 = {
   avatar_url: 'https://www.gravatar.com/avatar/b36aafe03e05a85031fd8c411b69f792?d=mm&s=200'
 }
 
-export const serverError = (syscall: any, code: number) => ({ syscall, code })
+export const serverError = (syscall: any, code: any) => ({ syscall, code })
 
 // tslint:disable-next-line:max-line-length
-export const passwordError = '[{"location":"body","param":"password","value":"testPassword","msg":"password must have a mimimum of eight characters, at least one letter, one number and one special character"}]'
+export const passwordError = '[{"location":"body","param":"password","value":"testPassword","msg":"Password (at least 8 characters, including 1 uppercase letter, 1 lowercase letter, and 1 number)"}]'
 export const emailError = '[{"location":"body","param":"email","value":"testEmail","msg":"please supply a valid email address"}]'
 // tslint:disable-next-line:max-line-length
 export const nameError = '[{"location":"body","param":"name","value":"test  User","msg":"Full name should be 2 to 50  characters long,  single spaced."}]'
