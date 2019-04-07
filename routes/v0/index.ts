@@ -5,7 +5,7 @@ import { ideaRoutes } from './idea.routes'
 
 export const routerV0 = Router()
 
-routerV0.use('/api/v0/access-tokens', authRoutes)
-routerV0.use('/api/v0/me', meRoutes)
-routerV0.use('/api/v0/users', userRoutes)
-routerV0.use('/api/v0/ideas', ideaRoutes)
+routerV0.use('/access-tokens', authRoutes)
+routerV0.use('/me', meRoutes)
+routerV0.use('/users', userRoutes)
+routerV0.use('/ideas', ideaRoutes)

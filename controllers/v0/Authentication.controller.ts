@@ -91,7 +91,7 @@ export class AuthenticationController {
    */
   static async verifyTokenMiddleware (req: Request, res: Response, next: NextFunction): Promise<any> {
     try {
-      const logout = req.originalUrl === '/api/v0/access-tokens' && req.method === 'DELETE'
+      const logout = req.originalUrl === '/access-tokens' && req.method === 'DELETE'
       const refresh = req.path === '/refresh'
       const token = logout || refresh ? req.body.refresh_token : req.get('x-access-token')
 

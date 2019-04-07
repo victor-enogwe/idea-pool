@@ -10,10 +10,10 @@ import { GeneratedAuth, UserPassword } from '../../../interfaces'
 describe('Users -: ', () => {
   let accessToken: string
 
-  describe('/api/v0/users:', () => {
+  describe('/users:', () => {
 
     describe('POST - signup - /: ', () => {
-      const requestEndpoint = '/api/v0/users'
+      const requestEndpoint = '/users'
 
       it('should not register a user with an invalid name', () => server
         .post(requestEndpoint)
@@ -49,8 +49,8 @@ describe('Users -: ', () => {
     })
   })
 
-  describe('/api/v0/me:', () => {
-    const requestEndpoint = '/api/v0/me'
+  describe('/me:', () => {
+    const requestEndpoint = '/me'
 
     it('should get the user details', () => server
       .get(requestEndpoint)

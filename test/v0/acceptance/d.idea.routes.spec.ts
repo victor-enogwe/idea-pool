@@ -6,12 +6,12 @@ import { database } from '../../../models'
 import { testEmail, testPassword, ideaFieldsError, idea, ideaMembers } from '../helpers/stubs'
 import { Idea } from '../../../interfaces'
 
-describe('/api/v0/ideas:', () => {
+describe('/ideas:', () => {
   after(() => database.then(db => db.connection.dropDatabase()))
   let token: string
   let ideadId: string
-  const requestEndpoint = '/api/v0/ideas'
-  const authEndpoint = '/api/v0/access-tokens'
+  const requestEndpoint = '/ideas'
+  const authEndpoint = '/access-tokens'
   before(async () => {
     token = await server
       .post(authEndpoint)

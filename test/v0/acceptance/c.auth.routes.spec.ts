@@ -5,12 +5,12 @@ import { testEmail, testPassword, passwordError, emailError, jwtError } from '..
 import { jwtRegex } from '../../../utils'
 import { GeneratedAuth } from '../../../interfaces'
 
-describe('/api/v0/users:', () => {
+describe('/users:', () => {
   let accessToken: string
   let refreshToken: string
 
   describe('POST - login - /: ', () => {
-    const requestEndpoint = '/api/v0/access-tokens'
+    const requestEndpoint = '/access-tokens'
 
     it('should not login a user with an invalid email', () => server
       .post(requestEndpoint)
@@ -39,7 +39,7 @@ describe('/api/v0/users:', () => {
 
   describe('POST - refresh token - /: ', () => {
     before((done) => setTimeout(done, 1000))
-    const requestEndpoint = '/api/v0/access-tokens/refresh'
+    const requestEndpoint = '/access-tokens/refresh'
 
     it('should throw error if refresh token is not present', () => server
       .post(requestEndpoint)
@@ -56,21 +56,21 @@ describe('/api/v0/users:', () => {
       }))
 
     it('should invalidate the old access token after refresh', () => server
-      .get('/api/v0/me')
+      .get('/me')
       .set('x-access-token', accessToken)
       .expect(500)
       .then((res: request.Response) => expect(res.body.error).to.have.property('message', 'invalid signature')))
   })
 
   describe('POST - logout - /: ', () => {
-    const requestEndpoint = '/api/v0/access-tokens'
+    const requestEndpoint = '/access-tokens'
     it('should logout user', async () => server
       .delete(requestEndpoint)
       .send({ refresh_token: refreshToken })
       .expect(204))
 
     it('should invalidate all tokens', async () => server
-      .get('/api/v0/me')
+      .get('/me')
       .set('x-access-token', refreshToken)
       .expect(500)
       .then((res: request.Response) => expect(res.body.error).to.have.property('message', 'invalid signature')))
