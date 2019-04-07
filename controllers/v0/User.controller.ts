@@ -2,7 +2,7 @@ import { createHash } from 'crypto'
 import { model } from 'mongoose'
 import { NotFound } from 'http-errors'
 import { Request, Response, NextFunction } from 'express-serve-static-core'
-import { emailRegex } from '../utils'
+import { emailRegex } from '../../utils'
 
 export class UserController {
 

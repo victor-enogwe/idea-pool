@@ -3,7 +3,7 @@ import { Unauthorized } from 'http-errors'
 import { genSaltSync, hashSync, compareSync } from 'bcrypt'
 import { Types, model } from 'mongoose'
 import { Request, Response, NextFunction } from 'express-serve-static-core'
-import { CLIENT_URL, JWT_ALGO, JWT_SECRET, JWT_REFRESH_SECRET } from '../utils'
+import { CLIENT_URL, JWT_ALGO, JWT_SECRET, JWT_REFRESH_SECRET } from '../../utils'
 import {
   UserLogin,
   UserSignup,
@@ -12,7 +12,7 @@ import {
   Decoded,
   UserEmail,
   UserProfile
-} from '../interfaces'
+} from '../../interfaces'
 
 export class AuthenticationController {
 
@@ -91,11 +91,9 @@ export class AuthenticationController {
    */
   static async verifyTokenMiddleware (req: Request, res: Response, next: NextFunction): Promise<any> {
     try {
-      const logout = req.originalUrl === '/api/v1/access-tokens' && req.method === 'DELETE'
+      const logout = req.originalUrl === '/api/v0/access-tokens' && req.method === 'DELETE'
       const refresh = req.path === '/refresh'
       const token = logout || refresh ? req.body.refresh_token : req.get('x-access-token')
-
-      if (!token) { throw new Unauthorized('please supply a valid json web  token') }
 
       const { userId } = AuthenticationController.decodeToken({ token })
       const pass = await model<UserPassword>('UserPassword').findOne({ userId, active: true }).exec()

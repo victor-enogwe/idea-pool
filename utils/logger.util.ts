@@ -8,10 +8,10 @@ import { HttpError } from 'http-errors'
  * @property {HttpError} error the http error
  * @property { withStack: Boolean } options  The error option
  *
- * @return {HttpError}   error
+ * @return {HttpError | { message: string; stack?: string }}   error
  */
-export function errorToJSON (error: HttpError, options: { withStack: Boolean }): HttpError {
-  const object = typeof error.toJSON === 'function' ? error.toJSON() : { message: error.message, stack: error.stack }
+export function errorToJSON (error: HttpError, options: { withStack: Boolean }): { message: string; stack?: string; errors?: {} } {
+  const object: { message: string; stack?: string; errors?: {} } = { message: error.message, stack: error.stack, errors: error.errors }
   if (!options.withStack) { object.stack = undefined }
 
   return object
@@ -35,9 +35,10 @@ export function logServiceError (error: HttpError): object {
     logMsg = `::1 - - [${date}] "${method} ${path} HTTP/${httpVersion}" `
     logMsg += `${status} - "${message || ''} ${code || ''}" ${ua}"`
     logMsg += ` - "mentorXIdeas (+${protocol}//${servername})`
-  } else {
+  }
+  if (error.stack) {
     const stack = process.env.NODE_ENV === 'development' ? error.stack : ''
-    logMsg = `${error.message} ${error.code || stack}`
+    logMsg += `\n${error.message} ${error.code || stack}`
   }
 
   return logger.error(logMsg)

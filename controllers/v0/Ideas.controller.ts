@@ -1,7 +1,7 @@
 import { model } from 'mongoose'
 import { NotFound } from 'http-errors'
 import { Request, Response, NextFunction } from 'express-serve-static-core'
-import { Idea } from '../interfaces'
+import { Idea } from '../../interfaces'
 
 export class IdeaController {
 

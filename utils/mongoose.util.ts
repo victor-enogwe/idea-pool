@@ -35,18 +35,6 @@ export function stringSchema ({ minlength, maxlength, required = false, unique =
   }
 }
 
-/**
- * Validate Email  Address
- *
- * @export
- * @param {string} email the email address
- * @returns {boolean} is a valid email
- */
-export function validateEmail (email: string): boolean {
-  const emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/
-  return emailRegex.test(email)
-}
-
 function transform (doc: Document | any, ret: any, options: any) {
   ret.created_at = Date.parse(ret.created_at)
   ret.updated_at = Date.parse(ret.updated_at)

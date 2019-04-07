@@ -1,16 +1,17 @@
 import { expect } from 'chai'
+import { Types } from 'mongoose'
 import request from 'supertest'
 import { server } from '../helpers'
-import { database } from '../../models'
+import { database } from '../../../models'
 import { testEmail, testPassword, ideaFieldsError, idea, ideaMembers } from '../helpers/stubs'
-import { Idea } from '../../interfaces'
+import { Idea } from '../../../interfaces'
 
-describe('/api/v1/ideas:', () => {
+describe('/api/v0/ideas:', () => {
   after(() => database.then(db => db.connection.dropDatabase()))
   let token: string
   let ideadId: string
-  const requestEndpoint = '/api/v1/ideas'
-  const authEndpoint = '/api/v1/access-tokens'
+  const requestEndpoint = '/api/v0/ideas'
+  const authEndpoint = '/api/v0/access-tokens'
   before(async () => {
     token = await server
       .post(authEndpoint)
@@ -41,9 +42,15 @@ describe('/api/v1/ideas:', () => {
     it('should validate all idea fields', () => server
       .put(`${requestEndpoint}/${ideadId}`)
       .set({ 'x-access-token': token })
-      .send({})
       .expect(422)
       .then((res: request.Response) => expect(res.body.error).to.have.property('message', ideaFieldsError)))
+
+    it('should throw an error if idea does not exist', () => server
+      .put(`${requestEndpoint}/${Types.ObjectId()}`)
+      .set({ 'x-access-token': token })
+      .send({ content: 'hello world', ease: 20, impact: 20, confidence: 20 })
+      .expect(404)
+      .then((res: request.Response) => expect(res.body.error).to.have.property('message', 'idea does not exist')))
 
     it('should update an idea', () => server
       .put(`${requestEndpoint}/${ideadId}`)
@@ -76,6 +83,12 @@ describe('/api/v1/ideas:', () => {
   })
 
   describe('DELETE - delete - /: ', () => {
+
+    it('should throw an error if idea does not exist', () => server
+      .delete(`${requestEndpoint}/${Types.ObjectId()}`)
+      .set({ 'x-access-token': token })
+      .expect(404)
+      .then((res: request.Response) => expect(res.body.error).to.have.property('message', 'idea does not exist')))
 
     it('should delete an idea', () => server
       .delete(`${requestEndpoint}/${ideadId}`)
