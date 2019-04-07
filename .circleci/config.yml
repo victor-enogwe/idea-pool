@@ -85,26 +85,6 @@ jobs:
           name: Send Coverage To Code Climate
           command: ~/mentorXpool/cc-test-reporter after-build upload-coverage -t lcov
           when: always
-  build:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/mentorXpool
-      - run:
-          name: Build TypeScript Code
-          command: npm run build
-      - persist_to_workspace:
-          <<: *persist
-  deploy:
-    <<: *defaults
-    environment:
-      PROJECT_NAME: mentorXpool
-    steps:
-      - attach_workspace:
-          at: ~/mentorXpool
-      - run:
-          name: Deploy Application To Heroku
-          command: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
 workflows:
   version: 2
   setup-lint-test-coverage-build-deploy:
@@ -120,14 +100,3 @@ workflows:
           requires:
             - setup
             - test
-      - build:
-          requires:
-            - lint
-            - test
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - develop
