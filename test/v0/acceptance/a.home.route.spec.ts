@@ -64,11 +64,11 @@ describe('/api/v0:', () => {
 
       const allowedOrigin = 'http://theorigin.com'
 
-      it('should disable cors', () => server
+      it('should enable cors', () => server
         .options('/')
         .set('origin', allowedOrigin)
-        .expect('Access-Control-Allow-Origin', '*')
-        .expect(204))
+        .expect('Access-Control-Allow-Origin', 'http://theorigin.com')
+        .expect(404))
 
       it('should reject invalid origin', () => server
         .options('/')
@@ -82,6 +82,6 @@ describe('/api/v0:', () => {
       .options('/')
       .expect('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE')
       .expect('Access-Control-Allow-Credentials', 'true')
-      .expect(204))
+      .expect(404))
   })
 })
