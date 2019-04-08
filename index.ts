@@ -55,15 +55,8 @@ export function onError (error: HttpError): Logger {
 }
 
 app.options('*', cors(corsOptions), helmet({ noSniff: true, noCache: true }))
-app.use(responseTime({ header: 'X-Runtime' }))
-app.use(cors(corsOptions), helmet({ noSniff: true, noCache: true }))
-app.use(
-  express.urlencoded({ extended: true }),
-  express.json(),
-  helmet({ noSniff: true, noCache: true }),
-  cors(),
-  httpRequestLoggingMiddleware
-)
+app.use(responseTime({ header: 'X-Runtime' }), express.urlencoded({ extended: false }), express.json())
+app.use(cors(corsOptions), helmet({ noSniff: true, noCache: true }), httpRequestLoggingMiddleware)
 app.get('/', apiHomeMiddleware)
 app.use(routerV0)
 app.use(errorFourZeroFourMiddleware, httpErrorMiddleware)
